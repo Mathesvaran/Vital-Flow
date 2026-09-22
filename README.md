@@ -1,26 +1,44 @@
 # Vital Flow
 
-Initial authentication and profile setup for the VitalFlow blood management platform.
+VitalFlow is a blood management platform connecting donors, hospitals, and blood banks.
 
-## Project structure
+## Requirements
 
-- `backend`: Spring Boot, Java 21, Maven, PostgreSQL, JWT foundation
-- `frontend`: React, Vite, Tailwind CSS, React Router
+- Java 21
+- Maven 3.9+
+- Node.js LTS and npm
+- PostgreSQL running locally
+
+## Database setup
+
+Create a PostgreSQL database:
+
+```sql
+CREATE DATABASE vitalflow;
+```
+
+The backend defaults are:
+
+- URL: `jdbc:postgresql://localhost:5432/vitalflow`
+- Username: `postgres`
+- Password: `postgres`
+
+If your local values differ, set `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD` in your environment. `spring.jpa.hibernate.ddl-auto=update` creates and updates the `users` table automatically for local development.
 
 ## Run the backend
 
-1. Create a PostgreSQL database named `vitalflow`.
-2. Update the environment variables if your local credentials differ.
-3. Run:
+From the repository root:
 
 ```bash
 cd backend
 mvn spring-boot:run
 ```
 
-The API starts on `http://localhost:8080`.
+Backend: `http://localhost:8080`
 
 ## Run the frontend
+
+In a second terminal:
 
 ```bash
 cd frontend
@@ -28,11 +46,58 @@ npm install
 npm run dev
 ```
 
-The frontend starts on `http://localhost:5173`.
+Frontend: `http://localhost:5173`
 
-## Initial API endpoints
+Optional frontend API override:
 
-- `POST /api/auth/register`
-- `POST /api/auth/login`
+```bash
+VITE_API_BASE_URL=http://localhost:8080/api npm run dev
+```
 
-Registration accepts `fullName`, either `email` or `phoneNumber`, `password`, and a non-admin `role`.
+## Working authentication APIs
+
+### Register
+
+`POST http://localhost:8080/api/auth/register`
+
+```json
+{
+  "fullName": "Alex Johnson",
+  "email": "alex@example.com",
+  "phoneNumber": "",
+  "password": "Password123",
+  "role": "DONOR"
+}
+```
+
+Use `DONOR`, `HOSPITAL`, or `BLOOD_BANK`. Email or phone is required. Public `ADMIN` registration is rejected.
+
+### Login
+
+`POST http://localhost:8080/api/auth/login`
+
+```json
+{
+  "identifier": "alex@example.com",
+  "password": "Password123"
+}
+```
+
+### Current user
+
+`GET http://localhost:8080/api/auth/me` with:
+
+```text
+Authorization: Bearer <token>
+```
+
+## UI routes
+
+- `/`
+- `/login`
+- `/register/donor`
+- `/register/hospital`
+- `/register/blood-bank`
+- `/donor/dashboard`
+- `/hospital/dashboard`
+- `/blood-bank/dashboard`
